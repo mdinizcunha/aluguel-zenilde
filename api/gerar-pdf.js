@@ -9,8 +9,9 @@ exports.handler = async function(event, context) {
   const html = `
     <html>
       <head>
+        <meta charset="UTF-8">
         <style>
-          body { font-family: Arial; font-size: 12px; padding: 20px; }
+          body { font-family: Arial, sans-serif; font-size: 12px; padding: 20px; }
           h2 { text-align: center; }
           p { text-align: justify; margin-bottom: 10px; }
           strong { font-weight: bold; }
@@ -39,7 +40,7 @@ exports.handler = async function(event, context) {
     });
 
     const page = await browser.newPage();
-    await page.setContent(html);
+    await page.setContent(html, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({ format: "A4" });
 
     await browser.close();
@@ -47,11 +48,12 @@ exports.handler = async function(event, context) {
     return {
       statusCode: 200,
       headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": "attachment; filename=contrato.pdf"
+        "Content-Type": "application/json",
       },
-      body: pdfBuffer.toString("base64"),
-      isBase64Encoded: true,
+      body: JSON.stringify({
+        body: pdfBuffer.toString("base64"),
+        isBase64Encoded: true,
+      }),
     };
 
   } catch (e) {
