@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Contrato</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h2>Gerador de Contrato de Aluguel</h2>
+
+  <label>Nome do Inquilino:</label>
+  <input id="nome" type="text" placeholder="Digite o nome" />
+
+  <label>CPF do Inquilino:</label>
+  <input id="cpf" type="text" placeholder="Digite o CPF" />
+
+  <label>Endereço do Imóvel:</label>
+  <input id="endereco" type="text" placeholder="Digite o endereço do imóvel" />
+
+  <label>Valor do Aluguel (R$):</label>
+  <input id="valor" type="number" step="0.01" placeholder="Ex.: 2500.00" />
+
+  <label>Data de Início do Contrato:</label>
+  <input id="inicio" type="date" />
+
+  <label>Finalidade do Imóvel:</label>
+  <input id="finalidade" type="text" placeholder="Ex.: Residencial, Comercial" />
+
+  <label>Prazo do Contrato (em meses):</label>
+  <input id="prazo" type="number" placeholder="Ex.: 12" />
+
+  <label>Percentual de Aumento (%):</label>
+  <input id="percentual" type="number" placeholder="Ex.: 6" />
+
+  <button onclick="gerarPDF()">Gerar PDF do Contrato</button>
+
+  <script>
+    async function gerarPDF() {
+      const data = {
+        nome: document.getElementById("nome").value,
+        cpf: document.getElementById("cpf").value,
+        endereco: document.getElementById("endereco").value,
+        valor: document.getElementById("valor").value,
+        inicio: document.getElementById("inicio").value,
+        finalidade: document.getElementById("finalidade").value,
+        prazo: document.getElementById("prazo").value,
+        percentual: document.getElementById("percentual").value,
+      };
+
+      const res = await fetch("/api/gerar-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "contrato.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+  </script>
+</body>
+</html>
