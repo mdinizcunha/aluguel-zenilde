@@ -8,7 +8,16 @@ export default async function handler(req, res) {
 
   const body = req.body;
 
-  const { nome, cpf, endereco, valor, inicio, finalidade, prazo, percentual } = body;
+  const {
+    nome,
+    cpf,
+    endereco,
+    valor,
+    inicio,
+    finalidade,
+    prazo,
+    percentual
+  } = body;
 
   const html = `
     <html>
@@ -36,10 +45,14 @@ export default async function handler(req, res) {
   `;
 
   try {
+    const executablePath =
+      (await chromium.executablePath) ||
+      "/usr/bin/chromium-browser";
+
     const browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath,
+      executablePath,
       headless: chromium.headless,
     });
 
