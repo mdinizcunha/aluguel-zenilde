@@ -82,7 +82,7 @@
         percentual: document.getElementById("percentual").value,
       };
 
-      const res = await fetch("/api/gerar-pdf", {
+      const res = await fetch("https://aluguel-zenilde.vercel.app/api/gerar-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -90,12 +90,16 @@
 
       const json = await res.json();
 
+      if (json.error) {
+        alert("Erro no servidor: " + json.error);
+        return;
+      }
+
       if (!json.body) {
         alert("Erro ao gerar PDF!");
         return;
       }
 
-      // converte base64 → bytes → Blob
       const base64 = json.body;
       const binaryString = atob(base64);
       const len = binaryString.length;
