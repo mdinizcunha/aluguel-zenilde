@@ -1,8 +1,12 @@
-const chromium = require("chrome-aws-lambda");
-const puppeteer = require("puppeteer-core");
+import chromium from "chrome-aws-lambda";
+import puppeteer from "puppeteer-core";
 
-exports.handler = async function(event, context) {
-  const body = JSON.parse(event.body);
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  const body = req.body;
 
   const { nome, cpf, endereco, valor, inicio, finalidade, prazo, percentual } = body;
 
@@ -45,21 +49,10 @@ exports.handler = async function(event, context) {
 
     await browser.close();
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        body: pdfBuffer.toString("base64"),
-        isBase64Encoded: true,
-      }),
-    };
-
+    res.setHeader("Content-Type", "application/pdf");
+    res.send(pdfBuffer);
   } catch (e) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: e.message })
-    };
+    console.error(e);
+    res.status(500).json({ error: e.message });
   }
-};
+}
